@@ -16,6 +16,8 @@ Using: https://github.com/discordapp/discord-rpc
 
 https://discordapp.com/developers/applications/me
 
+If you want to contribute, fork and make a pull request!
 
+Note: the code is messy and all over the place, but hey.. im sharing it anyways!
 
 
