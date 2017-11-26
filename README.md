@@ -5,10 +5,12 @@ This was created by General Wrex on November 26th, 2017, if you create your own 
 if you use anything in your own program besides the wrapper or discord-rpc, please credit me ;)
 
 
+It doesn't contain the code for accepting an invite yet, but it will set your rich presence on discord!
 
 
+Create a NON BOT app (Don't try to set ADVANCED RICH PRESENCE FEATURES, unless you're actually creating a game or application that you want approved by discord), setup rich presence, run the program.. and it should set the details to your discord name
 
-Create a NON BOT app, setup rich presence, run the program.. and it should set the details to your discord name
+This was designed as a test to see if it was possible to create an app to set the presence of a user, it was released on Github because i like showing all of my programming stuff that's not under a NDA!
 
 Using: https://github.com/discordapp/discord-rpc
 
