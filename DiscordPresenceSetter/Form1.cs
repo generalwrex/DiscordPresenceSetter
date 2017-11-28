@@ -1,6 +1,10 @@
 ﻿using DiscordPresenceSetter.Properties;
 using System;
 using System.ComponentModel;
+using System.Configuration;
+using System.IO;
+using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
 using Timer = System.Timers.Timer;
 
@@ -58,6 +62,28 @@ namespace DiscordPresenceSetter
             return false;
         }
 
+        public void LoadDefaults(bool save = true )
+        {
+            Settings.Default.ApplicationID = "0";
+            Settings.Default.State = "My Lobby";
+            Settings.Default.Details = "Rich Presence Is Cool!";
+            Settings.Default.SmallImageKey = "";
+            Settings.Default.SmallImageText = "";
+            Settings.Default.LargeImageKey = "";
+            Settings.Default.LargeImageText = "";
+            Settings.Default.PartyID = "myparty";
+            Settings.Default.MatchSecret = "match";
+            Settings.Default.JoinSecret = "join";
+            Settings.Default.SpectateSecret = "spectate";
+            Settings.Default.PartySize = 1;
+            Settings.Default.PartyMax = 6;
+            Settings.Default.PartyTimer = 5;
+            Settings.Default.ResendPresence = true;
+
+            if(save)
+                Settings.Default.Save();
+        }
+
         public void LoadSettings()
         {
             try
@@ -81,6 +107,14 @@ namespace DiscordPresenceSetter
 
                 ResendPresenceCheckbox.Checked = Settings.Default.ResendPresence;
             }
+            catch(ConfigurationException ex)
+            {
+                var result = MessageBox.Show(ex.Message + "\r\n\r\nConfig is missing or is corrupted.\r\nWould you like to load the default settings?", "Config File Exception");
+                if(result == DialogResult.OK)
+                {
+                    LoadDefaults();
+                }
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + "\r\n " + "StackTrace: " + ex.StackTrace, "Settings Configured Wrong");
@@ -91,6 +125,11 @@ namespace DiscordPresenceSetter
 
         public Form1()
         {
+            string loc = Assembly.GetEntryAssembly().Location;
+            string path = String.Concat(loc, ".config");
+
+            LoadDefaults(false);
+
             InitializeComponent();
 
             FormLog.TextChanged += (sender, e) => {
@@ -109,7 +148,6 @@ namespace DiscordPresenceSetter
                     FormLog.ScrollToCaret();
                 }
             };
-
 
             StartButton.Enabled = !isRunning;
             StopButton.Enabled = isRunning;
