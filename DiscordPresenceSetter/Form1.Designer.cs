@@ -503,7 +503,7 @@
             this.Name = "Form1";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Discord Presence Setter V0.0.0.5- (Made By General Wrex)";
+            this.Text = "Discord Presence Setter V0.0.1.3- (Made By General Wrex)";
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();

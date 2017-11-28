@@ -2,9 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.Configuration;
-using System.IO;
-using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
 using Timer = System.Timers.Timer;
 
@@ -62,28 +59,6 @@ namespace DiscordPresenceSetter
             return false;
         }
 
-        public void LoadDefaults(bool save = true )
-        {
-            Settings.Default.ApplicationID = "0";
-            Settings.Default.State = "My Lobby";
-            Settings.Default.Details = "Rich Presence Is Cool!";
-            Settings.Default.SmallImageKey = "";
-            Settings.Default.SmallImageText = "";
-            Settings.Default.LargeImageKey = "";
-            Settings.Default.LargeImageText = "";
-            Settings.Default.PartyID = "myparty";
-            Settings.Default.MatchSecret = "match";
-            Settings.Default.JoinSecret = "join";
-            Settings.Default.SpectateSecret = "spectate";
-            Settings.Default.PartySize = 1;
-            Settings.Default.PartyMax = 6;
-            Settings.Default.PartyTimer = 5;
-            Settings.Default.ResendPresence = true;
-
-            if(save)
-                Settings.Default.Save();
-        }
-
         public void LoadSettings()
         {
             try
@@ -107,12 +82,27 @@ namespace DiscordPresenceSetter
 
                 ResendPresenceCheckbox.Checked = Settings.Default.ResendPresence;
             }
-            catch(ConfigurationException ex)
+            catch (ConfigurationException ex)
             {
-                var result = MessageBox.Show(ex.Message + "\r\n\r\nConfig is missing or is corrupted.\r\nWould you like to load the default settings?", "Config File Exception");
-                if(result == DialogResult.OK)
+                var result = MessageBox.Show(ex.Message + "\r\n\r\nConfig is missing or is corrupted.\r\nWould you like to load the default settings?", "Config File Exception", MessageBoxButtons.YesNoCancel);
+                if (result == DialogResult.Yes)
                 {
-                    LoadDefaults();
+                    StateBox.Text = "My Lobby";
+                    DetailsBox.Text = "Rich Presence Is Cool!";
+                    SmallImageKeyBox.Text = "";
+                    SmallImageTextBox.Text = "";
+                    LargeImageKeyBox.Text = "";
+                    LargeImageTextBox.Text = "";
+                    PartyIDBox.Text = "myparty";
+                    MatchSecretBox.Text = "match";
+                    JoinSecretBox.Text = "join";
+                    SpectateSecretBox.Text = "spectate";
+
+                    CurrentPartySize.Value = 1;
+                    MaxPartySize.Value = 6;
+                    PartyTimerCounter.Value = 5;
+
+                    SaveSettings();
                 }
             }
             catch (Exception ex)
@@ -125,19 +115,33 @@ namespace DiscordPresenceSetter
 
         public Form1()
         {
-            string loc = Assembly.GetEntryAssembly().Location;
-            string path = String.Concat(loc, ".config");
-
-            LoadDefaults(false);
-
             InitializeComponent();
 
-            FormLog.TextChanged += (sender, e) => {
+            MyApplicationID.Text = "0";
 
+            StateBox.Text = "My Lobby";
+            DetailsBox.Text = "Rich Presence Is Cool!";
+            SmallImageKeyBox.Text = "";
+            SmallImageTextBox.Text = "";
+            LargeImageKeyBox.Text = "";
+            LargeImageTextBox.Text = "";
+            PartyIDBox.Text = "myparty";
+            MatchSecretBox.Text = "match";
+            JoinSecretBox.Text = "join";
+            SpectateSecretBox.Text = "spectate";
+
+            CurrentPartySize.Value = 1;
+            MaxPartySize.Value = 6;
+            PartyTimerCounter.Value = 5;
+
+            ResendPresenceCheckbox.Checked = true;
+
+            LoadSettings();
+
+            FormLog.TextChanged += (sender, e) =>
+            {
                 FormLog.SelectionStart = FormLog.TextLength;
                 FormLog.ScrollToCaret();
-
-
             };
 
             FormLog.VisibleChanged += (sender, e) =>
@@ -152,8 +156,6 @@ namespace DiscordPresenceSetter
             StartButton.Enabled = !isRunning;
             StopButton.Enabled = isRunning;
             ResendPresenceButton.Enabled = isRunning;
-
-            LoadSettings();
 
             Log("Creating Event Handlers...");
             handlers = new DiscordRpc.EventHandlers();
@@ -265,7 +267,7 @@ namespace DiscordPresenceSetter
                 discordPresence.instance = false;
 
                 discordPresence.startTimestamp = ToUnixtime(DateTime.UtcNow);
-                discordPresence.endTimestamp = (ToUnixtime(DateTime.UtcNow) + 
+                discordPresence.endTimestamp = (ToUnixtime(DateTime.UtcNow) +
                     Convert.ToInt64(TimeSpan.FromMinutes(Settings.Default.PartyTimer == 0 ? 5 : Settings.Default.PartyTimer).TotalSeconds));
 
                 DiscordRpc.UpdatePresence(ref discordPresence);
@@ -275,8 +277,6 @@ namespace DiscordPresenceSetter
                 MessageBox.Show(ex.Message + "\r\n " + "StackTrace: " + ex.StackTrace, "Update Presence Exception");
             }
         }
-
-        
 
         public void Log(string message)
         {
@@ -310,9 +310,9 @@ namespace DiscordPresenceSetter
                 Log("Saved!");
         }
 
-        System.Windows.Forms.Timer timer2 = new System.Windows.Forms.Timer();
+        private System.Windows.Forms.Timer timer2 = new System.Windows.Forms.Timer();
 
-        void timer2_Tick(object sender, System.EventArgs e)
+        private void timer2_Tick(object sender, System.EventArgs e)
         {
             ResendPresenceButton.Enabled = true;
             timer.Stop();
